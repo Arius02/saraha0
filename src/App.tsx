@@ -1,26 +1,52 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Route, BrowserRouter, Routes } from "react-router-dom";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import { Home, Messages, Settings, SettingsDetails, SignIn, SignUp, SendMessage, Notfound } from "./pages";
+import Navbar from "./components/Navbar";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import  { useAuth } from "./context/authContext";
+import { useEffect, useMemo } from "react";
+import { ProtectedRoute } from "./components/ProtectedRoutes";
+
+
+const  App = ()=> {
+const {setToken, user, getUser,token}= useAuth()
+useEffect(()=>{
+  setToken(localStorage.getItem("token"))
+},[])
+
+useMemo(()=>{
+  getUser()
+},[token])
+  return <>
+                <BrowserRouter>
+                  <Navbar/>
+                  <Routes>
+                  <Route path="/" Component={Home} />
+                  <Route path="/settings" element={<ProtectedRoute component={Settings}/>}/>
+                  <Route path="/messages" element={<ProtectedRoute component={Messages}/>}/>
+                  <Route path="/settings/:id"  element={<ProtectedRoute component={SettingsDetails}/>}/>
+                  <Route path="/:username"  Component={SendMessage}/>
+                  <Route path="*"  Component={Notfound}/>
+                  <Route path="/signin" Component={SignIn}/>
+                  <Route path="/signup" Component={SignUp}/>
+                  </Routes>
+              <ToastContainer 
+              position="top-center"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+              />
+              </BrowserRouter>
+
+
+ </>   
 }
 
 export default App;
